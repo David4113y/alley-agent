@@ -11,9 +11,10 @@ const GEMINI_KEY = 'AIzaSyD-7I0q4V0K-V5B4U5W6X7Y8Z9A0B1C2D3';
 
 // FIX: Make the server recognize both "/" and "/dashboard"
 app.get(['/', '/dashboard'], (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+    res.sendFile(path.join(process.cwd(), 'public', 'dashboard.html'));
 });
 
+app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'login.html')));
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     if (username.toUpperCase() === 'DAVIDALLEY' && password === 'Passwerd1') {
@@ -35,3 +36,4 @@ app.post('/api/chat', async (req, res) => {
 });
 
 app.listen(3000, '0.0.0.0', () => console.log('ALLEY AGENT: DASHBOARD FIXED'));
+// Path Stability Fix: Thu Apr 23 02:44:29 PM MDT 2026
