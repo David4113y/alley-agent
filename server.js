@@ -11,11 +11,11 @@ const GEMINI_KEY = 'AIzaSyD-7I0q4V0K-V5B4U5W6X7Y8Z9A0B1C2D3';
 
 // FIX: Make the server recognize both "/" and "/dashboard"
 app.get(['/', '/dashboard'], (req, res) => {
-    res.sendFile(path.join(process.cwd(), 'public', 'dashboard.html'));
+    res.sendFile(path.join(process.cwd(), 'public', 'index.html'));
 });
 
-app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'login.html')));
-app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'login.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'index.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'index.html')));
 app.post('/login', (req, res) => res.redirect(307, '/api/login'));
 app.post('/login', (req, res) => res.redirect(307, '/api/login'));
 app.post('/login', (req, res) => res.redirect(307, '/api/login'));
@@ -43,3 +43,4 @@ app.post('/api/chat', async (req, res) => {
 app.listen(3000, '0.0.0.0', () => console.log('ALLEY AGENT: DASHBOARD FIXED'));
 // Path Stability Fix: Thu Apr 23 02:44:29 PM MDT 2026
 // Server Route Sync: Thu Apr 23 02:57:16 PM MDT 2026
+// Deploy Time: Thu Apr 23 03:35:41 PM MDT 2026
