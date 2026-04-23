@@ -15,6 +15,9 @@ app.get(['/', '/dashboard'], (req, res) => {
 });
 
 app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'login.html')));
+app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'login.html')));
+app.post('/login', (req, res) => res.redirect(307, '/api/login'));
+app.post('/login', (req, res) => res.redirect(307, '/api/login'));
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     if (username.toUpperCase() === 'DAVIDALLEY' && password === 'Passwerd1') {
@@ -37,3 +40,4 @@ app.post('/api/chat', async (req, res) => {
 
 app.listen(3000, '0.0.0.0', () => console.log('ALLEY AGENT: DASHBOARD FIXED'));
 // Path Stability Fix: Thu Apr 23 02:44:29 PM MDT 2026
+// Server Route Sync: Thu Apr 23 02:57:16 PM MDT 2026
