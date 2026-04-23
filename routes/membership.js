@@ -56,7 +56,7 @@ async function sendNewMembershipAlert(username, plan, amount, paymentMethod, pay
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Alley Agent <onboarding@resend.dev>",
+        from: "Alleyesonme-AI <onboarding@resend.dev>",
         to: [adminEmail],
         subject: `NEW MEMBERSHIP: ${username} — ${plan} ($${(amount / 100).toFixed(2)})`,
         html: `
@@ -187,7 +187,7 @@ router.post("/stripe-checkout", requireAuth, async (req, res) => {
           price_data: {
             currency: "usd",
             product_data: {
-              name: `Alley Agent — ${plan.label} Membership`,
+              name: `Alleyesonme-AI — ${plan.label} Membership`,
               description: `${plan.label} of unlimited AI assistant access`,
             },
             unit_amount: plan.cents,

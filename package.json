@@ -1,7 +1,7 @@
 {
   "name": "alley-agent-web",
   "version": "1.0.0",
-  "description": "Alley Agent — AI chat platform with membership system",
+  "description": "Alleyesonme-AI — AI chat platform with membership system",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

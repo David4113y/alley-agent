@@ -142,7 +142,7 @@ router.post("/conversations/:id/messages", requireActiveMembership, async (req, 
       console.error("Memory fetch error:", err);
     }
 
-    let systemContent = "You are Alley Agent, a helpful and knowledgeable AI assistant. Be concise, accurate, and helpful. Use markdown formatting when appropriate.";
+    let systemContent = "You are Alleyesonme-AI, a helpful and knowledgeable AI assistant. Be concise, accurate, and helpful. Use markdown formatting when appropriate.";
     if (existingMemory) {
       systemContent += `\n\nHere are things you remember about this user from previous conversations:\n${existingMemory}`;
       sendStep("Personalizing with your preferences...", "Loaded your saved context");

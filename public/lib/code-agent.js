@@ -420,7 +420,7 @@ function executeTool(name, args) {
 // System prompt
 // ---------------------------------------------------------------------------
 
-const SYSTEM_PROMPT = `You are Alley Agent in Developer Mode. You have tools to read, write, edit, list, search, run commands, and deploy the project's source code. The project is a Node.js/Express web app.
+const SYSTEM_PROMPT = `You are Alleyesonme-AI in Developer Mode. You have tools to read, write, edit, list, search, run commands, and deploy the project's source code. The project is a Node.js/Express web app.
 
 When asked to make changes:
 1. Read the relevant files first to understand the current code.

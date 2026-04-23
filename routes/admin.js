@@ -179,9 +179,9 @@ async function sendPasswordChangeAlert(username, ip) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Alley Agent Security <onboarding@resend.dev>",
+        from: "Alleyesonme-AI Security <onboarding@resend.dev>",
         to: [adminEmail],
-        subject: "ALERT: Admin Password Changed — Alley Agent",
+        subject: "ALERT: Admin Password Changed — Alleyesonme-AI",
         html: `
           <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:24px;background:#0d1117;color:#e6edf3;border-radius:12px;">
             <h2 style="color:#f85149;margin-bottom:16px;">Admin Password Changed</h2>

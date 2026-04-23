@@ -1,5 +1,5 @@
 /**
- * Alley Agent — Frontend Application
+ * Alleyesonme-AI — Frontend Application
  */
 
 // ===== State =====
@@ -425,7 +425,7 @@ async function openConversation(id) {
     container.innerHTML = "";
 
     if (data.messages.length === 0) {
-      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><h2 style="color:var(--text-primary);margin-bottom:8px;">Alley Agent</h2><p>Start typing to begin this conversation.</p></div>';
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);"><h2 style="color:var(--text-primary);margin-bottom:8px;">Alleyesonme-AI</h2><p>Start typing to begin this conversation.</p></div>';
     } else {
       data.messages.forEach((m) => appendMessage(m.role, m.content));
     }
@@ -461,7 +461,7 @@ function appendMessage(role, content) {
   const div = document.createElement("div");
   div.className = `message ${role}`;
   div.innerHTML = `
-    <div class="msg-role">${role === "user" ? "You" : "Alley Agent"}</div>
+    <div class="msg-role">${role === "user" ? "You" : "Alleyesonme-AI"}</div>
     <div class="msg-content">${formatMarkdown(content)}</div>
   `;
   container.appendChild(div);
@@ -621,7 +621,7 @@ async function sendMessage() {
       try {
         const data = await resp.json();
         if (data.code === "NO_MEMBERSHIP") {
-          appendMessage("assistant", "Thanks for trying Alley Agent! To continue chatting, please subscribe to a membership plan.");
+          appendMessage("assistant", "Thanks for trying Alleyesonme-AI! To continue chatting, please subscribe to a membership plan.");
           setTimeout(() => { showScreen("membership"); loadMembership(); }, 2000);
           return;
         }
@@ -678,7 +678,7 @@ async function sendMessage() {
 
       if (finalData.trialUsed) {
         setTimeout(() => {
-          appendMessage("assistant", "That was your free trial prompt! Subscribe to a membership plan to continue using Alley Agent with unlimited access.");
+          appendMessage("assistant", "That was your free trial prompt! Subscribe to a membership plan to continue using Alleyesonme-AI with unlimited access.");
           setTimeout(() => { showScreen("membership"); loadMembership(); }, 3000);
         }, 1500);
       }
