@@ -19,6 +19,7 @@ app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 
 app.post('/login', (req, res) => res.redirect(307, '/api/login'));
 app.post('/login', (req, res) => res.redirect(307, '/api/login'));
 app.post('/login', (req, res) => res.redirect(307, '/api/login'));
+app.get('/login', (req, res) => res.sendFile(path.join(process.cwd(), 'public', 'index.html')));
 app.post('/api/login', (req, res) => {
     const { username, password } = req.body;
     if (username.toUpperCase() === 'DAVIDALLEY' && password === 'Passwerd1') {
