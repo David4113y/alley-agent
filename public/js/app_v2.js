@@ -1,4 +1,4 @@
-/**
+const API_URL = 'https://alleyesonme.live';/**
  * Alleyesonme-AI — Frontend Application
  */
 
