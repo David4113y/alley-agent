@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>Admin Dashboard</title>
+</head>
+<body style="display: block; padding: 40px;">
+    <h1>Administrator Dashboard</h1>
+    
+    <div class="card" style="width: 100%; margin-bottom: 30px;">
+        <h3>Registration List</h3>
+        <table style="width: 100%; text-align: left; color: white;">
+            <tr>
+                <th>User</th>
+                <th>Role</th>
+                <th>Actions</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.role }}</td>
+                <td>
+                    <button class="execute-btn" style="width: auto; padding: 5px 10px;">Make VIP</button>
+                    <button style="background: red; border: none; color: white; padding: 5px 10px; border-radius: 5px;">Delete</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <div class="admin-dashboard">
+        <h3><i class="fas fa-tools"></i> Developer Toolbox</h3>
+        <p>System check. Respond with 'The Beast is Awake'.</p>
+        <button class="execute-btn" onclick="alert('The Beast is Awake')">EXECUTE</button>
+    </div>
+</body>
+</html>
