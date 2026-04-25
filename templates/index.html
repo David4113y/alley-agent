@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alley Empire | Digital Sovereignty</title>
+    <style>
+        :root { --primary-yellow: #ffcc00; --bg-dark: #121212; --text-light: #e0e0e0; }
+        body { font-family: sans-serif; background: var(--bg-dark); color: var(--text-light); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        
+        /* Auth Header */
+        .auth-bar { width: 100%; display: flex; justify-content: flex-end; padding: 15px; gap: 15px; }
+        .auth-btn { text-decoration: none; color: white; border: 1px solid var(--primary-yellow); padding: 8px 15px; border-radius: 5px; font-size: 0.9rem; }
+        .auth-btn.primary { background: var(--primary-yellow); color: black; font-weight: bold; }
+
+        /* Membership Box (Visitor Only) */
+        #membership-box { width: 90%; max-width: 600px; background: var(--primary-yellow); color: black; padding: 20px; border-radius: 12px; text-align: center; font-weight: bold; cursor: pointer; margin: 20px 0; transition: transform 0.2s; }
+        #membership-box:hover { transform: scale(1.02); }
+
+        /* Chat UI */
+        .chat-container { width: 90%; max-width: 800px; margin-top: 10px; }
+        #chat-box { height: 400px; overflow-y: auto; border: 1px solid #333; padding: 20px; border-radius: 12px; background: #1e1e1e; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+        .user-msg { align-self: flex-end; background: #333; padding: 10px; border-radius: 10px; color: var(--primary-yellow); }
+        .ai-msg { align-self: flex-start; background: #2a2a2a; padding: 10px; border-radius: 10px; border-left: 3px solid var(--primary-yellow); }
+        
+        .input-group { display: flex; gap: 10px; }
+        input { flex-grow: 1; padding: 15px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; }
+        .send-btn { background: var(--primary-yellow); border: none; padding: 10px 25px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        
+        /* Dropdown Menu */
+        .menu-container { position: fixed; top: 15px; left: 15px; z-index: 1000; }
+        .menu-btn { background: #333; color: white; border: 1px solid var(--primary-yellow); padding: 8px; border-radius: 5px; cursor: pointer; }
+        .dropdown { display: none; position: absolute; top: 40px; left: 0; background: #222; border: 1px solid var(--primary-yellow); border-radius: 5px; min-width: 180px; }
+        .dropdown a { display: block; color: white; padding: 10px; text-decoration: none; border-bottom: 1px solid #333; }
+        .dropdown a:hover { background: #333; }
+    </style>
+</head>
+<body>
+
+    <div class="auth-bar">
+        {% if not logged_in %}
+            <a href="/login" class="auth-btn">Log In</a>
+            <a href="/signup" class="auth-btn primary">Sign Up</a>
+        {% endif %}
+    </div>
+
+    <div class="menu-container">
+        <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+        <div id="dropdown" class="dropdown">
+            <a href="/">Home</a>
+            <a href="/games">Games (Free to Play)</a>
+            {% if logged_in %}
+                {% if is_admin %}
+                    <a href="/admin" style="color: var(--primary-yellow);">Admin Dashboard</a>
+                {% else %}
+                    <a href="/dashboard">My Dashboard</a>
+                {% endif %}
+                <a href="/logout">Sign Out</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <h1>Alley Empire AI</h1>
+
+    {% if not logged_in %}
+    <div id="membership-box" onclick="window.location.href='/signup'">
+        <p id="membership-text">Day Pass: $5 (Click to unlock full access)</p>
+    </div>
+    {% endif %}
+
+    <div class="chat-container">
+        <div id="chat-box">
+            <div class="ai-msg">The Beast is listening... How can I assist your sovereignty?</div>
+        </div>
+
+        <div class="input-group">
+            <input type="text" id="chat-input" placeholder="Ask me anything...">
+            <button class="send-btn" onclick="handleSend()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // 1. Membership Rotation
+        const plans = ["Day Pass: $5", "Weekly: $25", "Monthly: $50", "Yearly: $200"];
+        let i = 0;
+        const boxText = document.getElementById('membership-text');
+        if(boxText) {
+            setInterval(() => {
+                i = (i + 1) % plans.length;
+                boxText.innerText = plans[i] + " (Click to unlock full access)";
+            }, 5000);
+        }
+
+        // 2. AI Connection (FIXED)
+        async function handleSend() {
+            const input = document.getElementById('chat-input');
+            const chatBox = document.getElementById('chat-box');
+            const text = input.value.trim();
+            if(!text) return;
+
+            chatBox.innerHTML += `<div class="user-msg">${text}</div>`;
+            input.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ prompt: text })
+                });
+                const data = await response.json();
+                chatBox.innerHTML += `<div class="ai-msg">${data.response}</div>`;
+            } catch (e) {
+                chatBox.innerHTML += `<div class="ai-msg" style="color:red;">The Beast connection timed out.</div>`;
+            }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function toggleMenu() {
+            const d = document.getElementById('dropdown');
+            d.style.display = d.style.display === 'block' ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>
