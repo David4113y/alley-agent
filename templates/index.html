@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alleyesonme-Ai</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b0f19;
+            --card: rgba(25, 33, 50, 0.9);
+            --accent: #6366f1;
+            --text: #ffffff;
+            --dim: #94a3b8;
+        }
+
+        body {
+            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
+            background: linear-gradient(rgba(11, 15, 25, 0.9), rgba(11, 15, 25, 0.9)), 
+                        url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
+            background-size: cover; background-attachment: fixed;
+            color: var(--text); display: flex; justify-content: center; min-height: 100vh;
+        }
+
+        /* Floating Menu Button */
+        #menu-trigger {
+            position: fixed; top: 25px; left: 25px; width: 55px; height: 55px;
+            background: var(--accent); border-radius: 50%; display: flex;
+            align-items: center; justify-content: center; cursor: pointer;
+            z-index: 1001; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        /* Hidden Side Menu */
+        #side-menu {
+            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
+            background: #05070a; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000; padding: 100px 20px; border-right: 1px solid #1e293b;
+        }
+
+        .menu-item {
+            display: block; color: white; text-decoration: none; padding: 15px;
+            margin-bottom: 10px; border-radius: 12px; transition: 0.3s; font-weight: 500;
+        }
+
+        .menu-item:hover { background: #1e293b; transform: translateX(5px); }
+
+        /* Chat Interface */
+        .main-content { width: 90%; max-width: 700px; padding-top: 80px; text-align: center; }
+        
+        .input-box {
+            background: var(--card); border: 1px solid #1e293b; border-radius: 20px;
+            display: flex; padding: 10px 20px; margin: 40px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .input-box input {
+            flex: 1; background: transparent; border: none; color: white; font-size: 1.1rem; outline: none;
+        }
+
+        .response-area {
+            background: var(--card); border-radius: 15px; padding: 25px;
+            margin-bottom: 30px; text-align: left; display: none; line-height: 1.6;
+            border-left: 4px solid var(--accent);
+        }
+
+        .btn-gold {
+            background: linear-gradient(45deg, #fbbf24, #f59e0b); color: #000;
+            border: none; border-radius: 12px; padding: 18px; width: 100%;
+            font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="menu-trigger" onclick="toggleMenu()"><i class="fas fa-th-large"></i></div>
+
+    <nav id="side-menu">
+        <a href="/" class="menu-item"><i class="fas fa-comment-dots"></i> New Chat</a>
+        <a href="#" class="menu-item"><i class="fas fa-home"></i> Homepage</a>
+        <a href="#" class="menu-item"><i class="fas fa-gamepad"></i> Games</a>
+        {% if role == 'admin' %}
+            <a href="/admin" class="menu-item" style="border: 1px solid var(--accent);">
+                <i class="fas fa-user-shield"></i> Admin Dashboard
+            </a>
+        {% endif %}
+        <hr style="border: 0; border-top: 1px solid #1e293b; margin: 20px 0;">
+        <a href="/logout" class="menu-item" style="color: #ef4444;"><i class="fas fa-power-off"></i> Logout</a>
+    </nav>
+
+    <div class="main-content">
+        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Alleyesonme-Ai</h1>
+        <p style="color: var(--dim);">Digital Sovereignty Engine v2.0</p>
+
+        <div class="input-box">
+            <input type="text" id="promptInput" placeholder="Wake the Beast...">
+            <button style="background: var(--accent); border: none; color: white; border-radius: 50%; width: 45px; height: 45px; cursor: pointer;" onclick="askAI()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+
+        <div id="aiResponse" class="response-area"></div>
+
+        {% if not role %}
+        <div style="background: rgba(30, 41, 59, 0.4); padding: 30px; border-radius: 20px;">
+            <button class="btn-gold">Join the Empire</button>
+            <p style="margin-top: 15px; font-size: 0.9rem;">Member? <a href="/login" style="color: var(--accent);">Login here</a></p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('side-menu');
+            menu.style.left = menu.style.left === '0px' ? '-300px' : '0px';
+        }
+
+        async function askAI() {
+            const input = document.getElementById('promptInput');
+            const box = document.getElementById('aiResponse');
+            if(!input.value) return;
+
+            box.style.display = 'block';
+            box.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> The Beast is thinking...';
+            
+            const res = await fetch('/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message: input.value})
+            });
+            const data = await res.json();
+            box.innerText = data.agent_response;
+            input.value = '';
+        }
+    </script>
+</body>
+</html>
