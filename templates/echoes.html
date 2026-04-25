@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Echoes of Eternity | Side-Scroller</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <style>
+        body { margin: 0; background: #0a0510; overflow: hidden; font-family: serif; }
+        canvas { display: block; background: linear-gradient(#1a0a2e, #050510); margin: 0 auto; }
+        #ui { position: absolute; top: 15px; left: 15px; color: #d4af37; text-shadow: 0 0 10px #ff00ff; font-size: 1.2rem; }
+        .controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: space-around; pointer-events: none; }
+        .btn { width: 65px; height: 65px; background: rgba(138, 43, 226, 0.2); border: 2px solid #8a2be2; border-radius: 12px; color: #fff; display: flex; align-items: center; justify-content: center; pointer-events: auto; user-select: none; font-weight: bold; }
+        #attack { background: rgba(212, 175, 55, 0.3); border-color: #d4af37; }
+    </style>
+</head>
+<body>
+    <div id="ui">Spirit: DAVIDALLEY | Eternity Echoes: <span id="score">0</span></div>
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="controls">
+        <div class="btn" id="left">←</div>
+        <div class="btn" id="right">→</div>
+        <div class="btn" id="jump">JUMP</div>
+        <div class="btn" id="attack">STAFF</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const player = {
+            x: 100, y: 100, width: 35, height: 55,
+            color: '#8a2be2', dy: 0, speed: 6,
+            jumpPower: 14, jumps: 0, maxJumps: 2,
+            isAttacking: false, attackTimer: 0
+        };
+
+        const gravity = 0.55;
+        const platforms = [
+            { x: 0, y: canvas.height - 60, w: canvas.width * 2, h: 60 }, // Long ground
+            { x: 300, y: canvas.height - 180, w: 150, h: 15 },
+            { x: 550, y: canvas.height - 300, w: 150, h: 15 },
+            { x: 200, y: canvas.height - 420, w: 200, h: 15 }
+        ];
+
+        const keys = {};
+        
+        // Mobile Controls
+        const handleAction = (id, key) => {
+            const el = document.getElementById(id);
+            el.ontouchstart = (e) => { e.preventDefault(); keys[key] = true; if(id === 'jump') jump(); if(id === 'attack') attack(); };
+            el.ontouchend = () => keys[key] = false;
+        };
+
+        handleAction('left', 'ArrowLeft');
+        handleAction('right', 'ArrowRight');
+
+        function jump() {
+            if (player.jumps < player.maxJumps) {
+                player.dy = -player.jumpPower;
+                player.jumps++;
+            }
+        }
+
+        function attack() {
+            if (!player.isAttacking) {
+                player.isAttacking = true;
+                player.attackTimer = 15;
+            }
+        }
+
+        function update() {
+            if (keys['ArrowLeft']) player.x -= player.speed;
+            if (keys['ArrowRight']) player.x += player.speed;
+
+            player.dy += gravity;
+            player.y += player.dy;
+
+            // Platform Collision
+            platforms.forEach(p => {
+                if (player.x < p.x + p.w && player.x + player.width > p.x &&
+                    player.y + player.height > p.y && player.y + player.height < p.y + p.h + 10) {
+                    if (player.dy > 0) {
+                        player.dy = 0;
+                        player.y = p.y - player.height;
+                        player.jumps = 0;
+                    }
+                }
+            });
+
+            if (player.attackTimer > 0) player.attackTimer--;
+            else player.isAttacking = false;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw Mystic Environment
+            ctx.fillStyle = '#1a0525';
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            ctx.lineTo(200, canvas.height - 200);
+            ctx.lineTo(400, canvas.height);
+            ctx.fill();
+
+            // Draw Platforms
+            ctx.fillStyle = '#2d1b4e';
+            platforms.forEach(p => {
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+                ctx.strokeStyle = '#8a2be2';
+                ctx.strokeRect(p.x, p.y, p.w, p.h);
+            });
+
+            // Draw Staff Attack
+            if (player.isAttacking) {
+                ctx.fillStyle = 'rgba(212, 175, 55, 0.6)';
+                ctx.beginPath();
+                ctx.arc(player.x + player.width/2 + 30, player.y + 25, 25, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // Draw Player
+            ctx.fillStyle = player.color;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#ff00ff";
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.shadowBlur = 0;
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+        loop();
+    </script>
+</body>
+</html>
