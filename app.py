@@ -3,12 +3,13 @@ from flask import Flask, request, jsonify, render_template
 import google.generativeai as genai
 from dotenv import load_dotenv
 
+# Load environment variables (like your GEMINI_API_KEY)
 load_dotenv()
 
+# Initialize Flask and tell it to look for the 'templates' folder
 app = Flask(__name__)
 
 # --- ADMIN & VIP CONFIGURATION ---
-# This ensures your accounts exist on every fresh deploy
 ADMIN_DATA = {
     "username": "DAVIDALLEY",
     "password": "Passwerd1",
@@ -20,16 +21,20 @@ VIP_GUEST = {
     "password": "onlyfree4me"
 }
 
-# Configure your Gemini AI
+# --- AI CONFIGURATION ---
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 model = genai.GenerativeModel('gemini-pro')
 
+# --- MAIN ROUTES ---
+
 @app.route('/')
 def index():
+    """Main Dashboard"""
     return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
+    """Handles AI Chat requests"""
     user_message = request.json.get('message')
     if not user_message:
         return jsonify({"agent_response": "I didn't catch that. Try again?"})
@@ -40,9 +45,9 @@ def chat():
     except Exception as e:
         return jsonify({"agent_response": f"Error: {str(e)}"})
 
-# New Login Route for your Admin/VIP accounts
 @app.route('/login', methods=['POST'])
 def login():
+    """Handles Admin/VIP Login"""
     data = request.json
     u = data.get('username')
     p = data.get('password')
@@ -54,5 +59,20 @@ def login():
     
     return jsonify({"status": "error", "message": "Invalid credentials"}), 401
 
+# --- GAME CENTER ROUTES ---
+
+@app.route('/alley-agents')
+def alley_agents():
+    """Route for the retro city platformer"""
+    return render_template('alley-agents.html')
+
+@app.route('/echoes')
+def echoes():
+    """Route for the Echoes of Eternity quest"""
+    return render_template('echoes.html')
+
+# --- SERVER START ---
+
 if __name__ == "__main__":
+    # Render uses port 10000 by default
     app.run(host='0.0.0.0', port=10000)
