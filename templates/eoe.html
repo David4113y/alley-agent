@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EoE | Echoes of Eternity</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: 'Georgia', serif; }
+        canvas { display: block; background: #0d0d1a; }
+        .hud { position: absolute; top: 20px; left: 20px; color: #fff; text-transform: uppercase; letter-spacing: 2px; }
+        .attack-fx { position: absolute; pointer-events: none; color: #44ffff; font-weight: bold; animation: fade 0.5s forwards; }
+        @keyframes fade { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(2); } }
+    </style>
+</head>
+<body>
+    <div class="hud">Mana: <span id="mana">100</span> | Realm: The Void</div>
+    <canvas id="eoeCanvas"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('eoeCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+
+        let player = { x: 100, y: 100, w: 40, h: 60, dy: 0, jumps: 0, dashCooldown: 0 };
+        const gravity = 0.5;
+
+        function update() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Physics
+            player.dy += gravity;
+            player.y += player.dy;
+            if(player.y > canvas.height - 100) { player.y = canvas.height - 100; player.dy = 0; player.jumps = 0; }
+
+            // Player (The Mage)
+            ctx.fillStyle = "#7700ff";
+            ctx.fillRect(player.x, player.y, player.w, player.height);
+            
+            // Staff glow
+            ctx.shadowBlur = 15; ctx.shadowColor = "#00ffff";
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(player.x + 35, player.y + 10, 5, 40);
+            ctx.shadowBlur = 0;
+
+            requestAnimationFrame(update);
+        }
+
+        window.addEventListener('keydown', e => {
+            if(e.code === 'Space' && player.jumps < 2) { // Double Jump
+                player.dy = -12; player.jumps++;
+            }
+            if(e.code === 'KeyD' && player.dashCooldown <= 0) { // Dash
+                player.x += 150; player.dashCooldown = 60;
+            }
+            if(e.code === 'KeyA') { // Staff Attack
+                const fx = document.createElement('div');
+                fx.className = 'attack-fx'; fx.innerText = '✨ STAFF BURST';
+                fx.style.left = player.x + 50 + 'px'; fx.style.top = player.y + 'px';
+                document.body.appendChild(fx);
+                setTimeout(() => fx.remove(), 500);
+            }
+        });
+
+        setInterval(() => { if(player.dashCooldown > 0) player.dashCooldown--; }, 16);
+        update();
+    </script>
+</body>
+</html>
