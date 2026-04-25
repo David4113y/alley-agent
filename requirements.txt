@@ -1,6 +1,0 @@
-flask
-openai
-google-generativeai
-groq
-python-dotenv
-gunicorn
