@@ -3,132 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alleyesonme-Ai</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Alley Empire | Digital Sovereignty Engine</title>
     <style>
         :root {
-            --bg: #0b0f19;
-            --card: rgba(25, 33, 50, 0.9);
-            --accent: #6366f1;
-            --text: #ffffff;
-            --dim: #94a3b8;
+            --primary-yellow: #ffcc00;
+            --bg-dark: #121212;
+            --text-light: #e0e0e0;
         }
 
         body {
-            margin: 0; padding: 0; font-family: 'Inter', sans-serif;
-            background: linear-gradient(rgba(11, 15, 25, 0.9), rgba(11, 15, 25, 0.9)), 
-                        url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop');
-            background-size: cover; background-attachment: fixed;
-            color: var(--text); display: flex; justify-content: center; min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
 
-        /* Floating Menu Button */
-        #menu-trigger {
-            position: fixed; top: 25px; left: 25px; width: 55px; height: 55px;
-            background: var(--accent); border-radius: 50%; display: flex;
-            align-items: center; justify-content: center; cursor: pointer;
-            z-index: 1001; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        /* Membership Yellow Box */
+        #membership-container {
+            width: 90%;
+            max-width: 600px;
+            background-color: var(--primary-yellow);
+            color: black;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
         }
 
-        /* Hidden Side Menu */
-        #side-menu {
-            position: fixed; top: 0; left: -300px; width: 280px; height: 100%;
-            background: #05070a; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000; padding: 100px 20px; border-right: 1px solid #1e293b;
+        #membership-text {
+            margin: 0;
+            font-size: 1.3rem;
+            transition: opacity 0.5s ease;
         }
 
-        .menu-item {
-            display: block; color: white; text-decoration: none; padding: 15px;
-            margin-bottom: 10px; border-radius: 12px; transition: 0.3s; font-weight: 500;
+        /* Floating Menu */
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #333;
+            border: 2px solid var(--primary-yellow);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 1000;
         }
 
-        .menu-item:hover { background: #1e293b; transform: translateX(5px); }
-
-        /* Chat Interface */
-        .main-content { width: 90%; max-width: 700px; padding-top: 80px; text-align: center; }
-        
-        .input-box {
-            background: var(--card); border: 1px solid #1e293b; border-radius: 20px;
-            display: flex; padding: 10px 20px; margin: 40px 0; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        .dropdown-content {
+            display: none;
+            position: fixed;
+            top: 65px;
+            left: 20px;
+            background-color: #1e1e1e;
+            min-width: 160px;
+            border: 1px solid var(--primary-yellow);
+            border-radius: 8px;
+            z-index: 1000;
         }
 
-        .input-box input {
-            flex: 1; background: transparent; border: none; color: white; font-size: 1.1rem; outline: none;
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
         }
 
-        .response-area {
-            background: var(--card); border-radius: 15px; padding: 25px;
-            margin-bottom: 30px; text-align: left; display: none; line-height: 1.6;
-            border-left: 4px solid var(--accent);
+        .dropdown-content a:hover {
+            background-color: #333;
+            color: var(--primary-yellow);
         }
 
-        .btn-gold {
-            background: linear-gradient(45deg, #fbbf24, #f59e0b); color: #000;
-            border: none; border-radius: 12px; padding: 18px; width: 100%;
-            font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+        /* Chat Area */
+        .chat-container {
+            width: 90%;
+            max-width: 800px;
+            margin-top: 20px;
+        }
+
+        #chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 12px;
+            background: #1e1e1e;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            background: #222;
+            color: white;
+        }
+
+        .send-btn {
+            padding: 10px 25px;
+            background: var(--primary-yellow);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Prompt Suggestions */
+        .suggestions-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .suggestion-chip {
+            background: #222;
+            color: var(--text-light);
+            border: 1px solid #444;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-chip:hover {
+            border-color: var(--primary-yellow);
+            color: var(--primary-yellow);
         }
     </style>
 </head>
 <body>
 
-    <div id="menu-trigger" onclick="toggleMenu()"><i class="fas fa-th-large"></i></div>
+    <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+    <div id="myDropdown" class="dropdown-content">
+        <a href="/">Homepage</a>
+        <a href="/" onclick="location.reload();">New Chat</a>
+        <a href="/games">Games</a>
+        <a href="/login">Admin Dashboard</a>
+    </div>
 
-    <nav id="side-menu">
-        <a href="/" class="menu-item"><i class="fas fa-comment-dots"></i> New Chat</a>
-        <a href="#" class="menu-item"><i class="fas fa-home"></i> Homepage</a>
-        <a href="#" class="menu-item"><i class="fas fa-gamepad"></i> Games</a>
-        {% if role == 'admin' %}
-            <a href="/admin" class="menu-item" style="border: 1px solid var(--accent);">
-                <i class="fas fa-user-shield"></i> Admin Dashboard
-            </a>
-        {% endif %}
-        <hr style="border: 0; border-top: 1px solid #1e293b; margin: 20px 0;">
-        <a href="/logout" class="menu-item" style="color: #ef4444;"><i class="fas fa-power-off"></i> Logout</a>
-    </nav>
+    <h1>Alley Empire AI</h1>
 
-    <div class="main-content">
-        <h1 style="font-size: 2.5rem; margin-bottom: 10px;">Alleyesonme-Ai</h1>
-        <p style="color: var(--dim);">Digital Sovereignty Engine v2.0</p>
+    <div id="membership-container">
+        <p id="membership-text">Day Pass: $5</p>
+    </div>
 
-        <div class="input-box">
-            <input type="text" id="promptInput" placeholder="Wake the Beast...">
-            <button style="background: var(--accent); border: none; color: white; border-radius: 50%; width: 45px; height: 45px; cursor: pointer;" onclick="askAI()">
-                <i class="fas fa-paper-plane"></i>
-            </button>
+    <div class="chat-container">
+        <div id="chat-box">
+            <p><i>The Beast is listening... How can I assist your sovereignty today?</i></p>
         </div>
 
-        <div id="aiResponse" class="response-area"></div>
-
-        {% if not role %}
-        <div style="background: rgba(30, 41, 59, 0.4); padding: 30px; border-radius: 20px;">
-            <button class="btn-gold">Join the Empire</button>
-            <p style="margin-top: 15px; font-size: 0.9rem;">Member? <a href="/login" style="color: var(--accent);">Login here</a></p>
+        <div class="input-group">
+            <input type="text" id="chat-input" placeholder="Ask me anything...">
+            <button class="send-btn" id="send-button" onclick="handleSend()">Send</button>
         </div>
-        {% endif %}
+
+        <div class="suggestions-container">
+            <div class="suggestion-chip" onclick="quickPrompt('Tell me about digital sovereignty')">What is Sovereignty?</div>
+            <div class="suggestion-chip" onclick="quickPrompt('How do I become a domain registrar?')">Become a Registrar</div>
+            <div class="suggestion-chip" onclick="quickPrompt('Explain the Alley Agent capabilities')">Agent Capabilities</div>
+        </div>
     </div>
 
     <script>
+        // 1. Membership Rotation Logic
+        const plans = [
+            "Day Pass: $5", 
+            "Weekly Access: $25", 
+            "Monthly VIP: $50", 
+            "3-Month Elite: $100", 
+            "Annual Sovereign: $200"
+        ];
+        let planIndex = 0;
+
+        setInterval(() => {
+            const textEl = document.getElementById('membership-text');
+            textEl.style.opacity = 0;
+            setTimeout(() => {
+                planIndex = (planIndex + 1) % plans.length;
+                textEl.innerText = plans[planIndex];
+                textEl.style.opacity = 1;
+            }, 500);
+        }, 5000);
+
+        // 2. Menu Toggle Logic
         function toggleMenu() {
-            const menu = document.getElementById('side-menu');
-            menu.style.left = menu.style.left === '0px' ? '-300px' : '0px';
+            const dropdown = document.getElementById("myDropdown");
+            dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
         }
 
-        async function askAI() {
-            const input = document.getElementById('promptInput');
-            const box = document.getElementById('aiResponse');
-            if(!input.value) return;
+        // 3. Prompt Suggestion Logic
+        function quickPrompt(text) {
+            document.getElementById('chat-input').value = text;
+            handleSend();
+        }
 
-            box.style.display = 'block';
-            box.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> The Beast is thinking...';
+        // 4. Send Logic (Placeholder - connects to your backend)
+        function handleSend() {
+            const input = document.getElementById('chat-input');
+            const message = input.value;
+            if (!message) return;
             
-            const res = await fetch('/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: input.value})
-            });
-            const data = await res.json();
-            box.innerText = data.agent_response;
+            const chatBox = document.getElementById('chat-box');
+            chatBox.innerHTML += `<p><b>You:</b> ${message}</p>`;
             input.value = '';
+            
+            // Your existing AJAX/Fetch call to /chat would go here
+        }
+
+        // Close menu if clicked outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.menu-btn')) {
+                document.getElementById("myDropdown").style.display = "none";
+            }
         }
     </script>
 </body>
