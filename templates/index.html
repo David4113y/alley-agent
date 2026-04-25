@@ -9,6 +9,7 @@
             --primary-yellow: #ffcc00;
             --bg-dark: #121212;
             --text-light: #e0e0e0;
+            --accent-dark: #1e1e1e;
         }
 
         body {
@@ -61,7 +62,7 @@
             position: fixed;
             top: 65px;
             left: 20px;
-            background-color: #1e1e1e;
+            background-color: var(--accent-dark);
             min-width: 160px;
             border: 1px solid var(--primary-yellow);
             border-radius: 8px;
@@ -84,22 +85,22 @@
         .chat-container {
             width: 90%;
             max-width: 800px;
-            margin-top: 20px;
+            margin-top: 10px;
         }
 
         #chat-box {
-            height: 400px;
+            height: 350px;
             overflow-y: auto;
             border: 1px solid #333;
             padding: 20px;
             border-radius: 12px;
-            background: #1e1e1e;
+            background: var(--accent-dark);
+            margin-bottom: 15px;
         }
 
         .input-group {
             display: flex;
             gap: 10px;
-            margin-top: 20px;
         }
 
         input[type="text"] {
@@ -109,6 +110,11 @@
             border: 1px solid #444;
             background: #222;
             color: white;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary-yellow);
         }
 
         .send-btn {
@@ -120,13 +126,18 @@
             cursor: pointer;
         }
 
-        /* Prompt Suggestions */
-        .suggestions-container {
+        /* Prompt Suggestion Chips */
+        .suggestions-wrapper {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .prompt-container {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
             justify-content: center;
             flex-wrap: wrap;
+            min-height: 40px;
         }
 
         .suggestion-chip {
@@ -135,14 +146,21 @@
             border: 1px solid #444;
             padding: 8px 15px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s;
         }
 
         .suggestion-chip:hover {
             border-color: var(--primary-yellow);
             color: var(--primary-yellow);
+            background: #2a2a2a;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -164,7 +182,7 @@
 
     <div class="chat-container">
         <div id="chat-box">
-            <p><i>The Beast is listening... How can I assist your sovereignty today?</i></p>
+            <p style="color: #888;"><i>The Beast is listening... How can I assist your sovereignty today?</i></p>
         </div>
 
         <div class="input-group">
@@ -172,10 +190,10 @@
             <button class="send-btn" id="send-button" onclick="handleSend()">Send</button>
         </div>
 
-        <div class="suggestions-container">
-            <div class="suggestion-chip" onclick="quickPrompt('Tell me about digital sovereignty')">What is Sovereignty?</div>
-            <div class="suggestion-chip" onclick="quickPrompt('How do I become a domain registrar?')">Become a Registrar</div>
-            <div class="suggestion-chip" onclick="quickPrompt('Explain the Alley Agent capabilities')">Agent Capabilities</div>
+        <div class="suggestions-wrapper">
+            <p style="font-size: 0.75rem; color: #666; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">Trending Suggestions</p>
+            <div id="prompt-container" class="prompt-container">
+                </div>
         </div>
     </div>
 
@@ -189,7 +207,6 @@
             "Annual Sovereign: $200"
         ];
         let planIndex = 0;
-
         setInterval(() => {
             const textEl = document.getElementById('membership-text');
             textEl.style.opacity = 0;
@@ -200,32 +217,61 @@
             }, 500);
         }, 5000);
 
-        // 2. Menu Toggle Logic
+        // 2. Dynamic Prompt Suggestions (Top 20 Cycle)
+        const trendingPrompts = [
+            "How does AI work?", "Write a poem about coding", "Best way to learn Python",
+            "Explain Digital Sovereignty", "How to host a local LLM?", "Summarize the news",
+            "Create a workout plan", "Healthy dinner ideas", "How to use Cloudflare tunnels",
+            "What is the Beast AI?", "Write a business plan", "Top crypto trends 2026",
+            "How to be a domain registrar", "Fix Linux broken packages", "AI vs Human creativity",
+            "Explain quantum computing", "History of the internet", "Best games on Steam",
+            "How to secure a home server", "Future of open source"
+        ];
+
+        function updatePrompts() {
+            const container = document.getElementById('prompt-container');
+            container.innerHTML = ''; 
+            const shuffled = trendingPrompts.sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, 3);
+
+            selected.forEach(text => {
+                const div = document.createElement('div');
+                div.innerText = text;
+                div.className = 'suggestion-chip';
+                div.onclick = () => quickPrompt(text);
+                container.appendChild(div);
+            });
+        }
+        setInterval(updatePrompts, 8000);
+        updatePrompts();
+
+        // 3. UI Functionality
         function toggleMenu() {
             const dropdown = document.getElementById("myDropdown");
             dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
         }
 
-        // 3. Prompt Suggestion Logic
         function quickPrompt(text) {
             document.getElementById('chat-input').value = text;
             handleSend();
         }
 
-        // 4. Send Logic (Placeholder - connects to your backend)
         function handleSend() {
             const input = document.getElementById('chat-input');
-            const message = input.value;
+            const message = input.value.trim();
             if (!message) return;
             
             const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML += `<p><b>You:</b> ${message}</p>`;
+            chatBox.innerHTML += `<div style="margin-bottom:10px;"><b>You:</b> ${message}</div>`;
             input.value = '';
             
-            // Your existing AJAX/Fetch call to /chat would go here
+            // Auto-scroll to bottom
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Trigger your existing backend fetch here:
+            // fetch('/chat', { method: 'POST', body: JSON.stringify({prompt: message}) }) ...
         }
 
-        // Close menu if clicked outside
         window.onclick = function(event) {
             if (!event.target.matches('.menu-btn')) {
                 document.getElementById("myDropdown").style.display = "none";
