@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body { background: #050505; color: #fff; font-family: 'Segoe UI', sans-serif; padding: 40px; }
+        .container { max-width: 800px; margin: auto; }
+        .card { border: 1px solid #ffcc00; padding: 30px; margin-bottom: 25px; border-radius: 12px; background: #111; }
+        input { background: #1a1a1a; border: 1px solid #444; color: #ffcc00; padding: 12px; width: 100%; margin: 10px 0; border-radius: 6px; box-sizing: border-box; }
+        button { background: #ffcc00; color: #000; padding: 14px; border: none; cursor: pointer; font-weight: bold; border-radius: 6px; width: 100%; transition: 0.2s; }
+        button:hover { background: #e6b800; }
+        h1, h2 { color: #ffcc00; letter-spacing: 1px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Alley Empire Admin</h1>
+        <a href="/" style="color:#888; text-decoration:none;"><- Back to Agent Interface</a>
+        <hr style="border: 1px solid #222; margin: 30px 0;">
+
+        <div class="card">
+            <h2>Identity Override</h2>
+            <p>Update your master login credentials.</p>
+            <form action="/update_admin" method="POST">
+                <input type="text" name="username" placeholder="New Admin User" required>
+                <input type="password" name="password" placeholder="New Admin Pass" required>
+                <button type="submit">Deploy Credentials</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2>Hospitality & VIP</h2>
+            <p>Set credentials for Friends & Family access.</p>
+            <form action="/update_vip" method="POST">
+                <input type="text" name="vip_user" placeholder="Guest Username" required>
+                <input type="text" name="vip_pass" placeholder="Guest Password" required>
+                <button type="submit">Activate VIP Access</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
