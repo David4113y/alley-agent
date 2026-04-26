@@ -1,115 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alley Empire | Agent UI</title>
-    <style>
-        :root { --primary-yellow: #ffcc00; --bg-dark: #121212; --text-light: #e0e0e0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg-dark); color: var(--text-light); margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        
-        /* Top Navigation */
-        .top-nav { width: 100%; display: flex; justify-content: space-between; padding: 15px; box-sizing: border-box; }
-        .btn { text-decoration: none; color: white; border: 1px solid var(--primary-yellow); padding: 8px 16px; border-radius: 6px; font-weight: bold; cursor: pointer; }
-        .btn-gold { background: var(--primary-yellow); color: black; border: none; }
-
-        /* Membership Button (VISITOR ONLY) */
-        #promo-box { width: 90%; max-width: 650px; background: var(--primary-yellow); color: black; padding: 20px; border-radius: 12px; text-align: center; font-weight: 800; cursor: pointer; margin: 20px 0; box-shadow: 0 0 20px rgba(255,204,0,0.15); transition: 0.3s; }
-        #promo-box:hover { transform: scale(1.01); box-shadow: 0 0 30px rgba(255,204,0,0.3); }
-
-        /* Chat Frame */
-        .chat-container { width: 95%; max-width: 850px; flex-grow: 1; display: flex; flex-direction: column; }
-        #chat-box { height: 450px; overflow-y: auto; border: 1px solid #333; padding: 25px; border-radius: 15px; background: #1a1a1a; margin-bottom: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        .input-bar { display: flex; gap: 10px; margin-bottom: 25px; }
-        input { flex-grow: 1; padding: 18px; border-radius: 10px; border: 1px solid #444; background: #222; color: white; font-size: 1rem; outline: none; }
-        input:focus { border-color: var(--primary-yellow); }
-
-        /* Dropdown Menu */
-        .menu-content { display: none; position: absolute; top: 60px; left: 15px; background: #222; border: 1px solid var(--primary-yellow); border-radius: 8px; z-index: 1000; min-width: 220px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .menu-content a { display: block; color: white; padding: 15px; text-decoration: none; border-bottom: 1px solid #333; }
-        .menu-content a:hover { background: #333; color: var(--primary-yellow); }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Alleyesonme-AI</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
 </head>
 <body>
+  <!-- ===== Landing Page ===== -->
+  <div id="landing-screen" class="landing-container" style="display:none">
+    <div class="landing-overlay"></div>
+    <div class="landing-content">
+      <div class="landing-hero">
+        <div class="landing-logo">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <rect width="56" height="56" rx="16" fill="url(#lg)"/>
+            <path d="M18 38L28 18L38 38" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="28" cy="33" r="3.5" fill="#fff"/>
+            <defs><linearGradient id="lg" x1="0" y1="0" x2="56" y2="56"><stop stop-color="#58a6ff"/><stop offset="1" stop-color="#a371f7"/></linearGradient></defs>
+          </svg>
+        </div>
+        <h1 class="landing-title">Alleyesonme-AI</h1>
+        <p class="landing-tagline">Your personal AI agent &amp; agency — powered by advanced AI. Ask anything, get tasks done, play games, and more.</p>
+      </div>
 
-    <div class="top-nav">
-        <div class="menu-wrap">
-            <button class="btn" onclick="toggleMenu()">☰ System Menu</button>
-            <div id="dropdown-menu" class="menu-content">
-                <a href="/">Home Dashboard</a>
-                <a href="/games">The Arcade (Free)</a>
-                {% if logged_in %}
-                    {% if is_admin %}<a href="/admin" style="color:var(--primary-yellow)">Admin Console</a>{% endif %}
-                    <a href="/logout">Log Out</a>
-                {% endif %}
-            </div>
+      <div class="landing-chat-preview">
+        <div class="landing-input-wrapper">
+          <textarea class="landing-input" placeholder="Ask me anything! I'm here to help" readonly rows="1"></textarea>
+          <button class="landing-send-btn" disabled aria-label="Send">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10L16 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M11 5L16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
-        <div class="auth-box">
-            {% if not logged_in %}
-                <a href="/login" class="btn">Log In</a>
-                <a href="/signup" class="btn btn-gold">Sign Up</a>
-            {% endif %}
+      </div>
+
+      <div class="landing-notice">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="8" stroke="#58a6ff" stroke-width="1.5"/><path d="M9 5.5V9.5" stroke="#58a6ff" stroke-width="1.5" stroke-linecap="round"/><circle cx="9" cy="12.5" r="1" fill="#58a6ff"/></svg>
+        <span>Create a free account to interact with the AI agent. Membership required for unlimited access.</span>
+      </div>
+
+      <!-- Arcade Preview on Landing -->
+      <div class="landing-arcade-preview">
+        <h3>Creator Content Arcade</h3>
+        <p>Play games for free — no account needed!</p>
+        <button class="btn-arcade-preview" onclick="showScreen('arcade-screen')">Enter Arcade</button>
+      </div>
+
+      <div class="landing-cta">
+        <button class="btn-purchase-membership" id="btn-landing-purchase">Purchase Membership Now!</button>
+        <p class="landing-pricing-hint">Plans starting at $25/week &middot; Card, PayPal &amp; Crypto accepted</p>
+      </div>
+
+      <div class="landing-auth-links">
+        <span>Already have an account?</span>
+        <a href="#" id="landing-signin">Sign In</a>
+        <span class="landing-divider">&middot;</span>
+        <a href="#" id="landing-register">Create Account</a>
+      </div>
+
+      <div class="landing-projects">
+        <p class="landing-projects-label">More from David Alley</p>
+        <div class="landing-projects-links">
+          <a href="https://davidalleyway-arch.github.io/technotools/" target="_blank" rel="noopener">TechnoTools</a>
+          <span class="landing-divider">&middot;</span>
+          <a href="https://david4113y.github.io/" target="_blank" rel="noopener">David4113y</a>
+          <span class="landing-divider">&middot;</span>
+          <a href="https://david4113y.github.io/domainforge/" target="_blank" rel="noopener">DomainForge</a>
         </div>
+      </div>
     </div>
+  </div>
 
-    <h1>Alley Agent</h1>
-
-    {% if not logged_in %}
-    <div id="promo-box" onclick="window.location.href='/signup'">
-        <span id="price-rotate">Day Pass: $5</span> — Unlock Full Agent Sovereignty
-    </div>
-    {% endif %}
-
-    <div class="chat-container">
-        <div id="chat-box">
-            <p style="color: #666;"><i>System initialized on The Beast (192.168.0.73). Awaiting prompt...</i></p>
+  <!-- ===== Auth Screen ===== -->
+  <div id="auth-screen" class="auth-container" style="display:none">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <rect width="48" height="48" rx="14" fill="url(#logo-grad)"/>
+          <path d="M16 32L24 16L32 32" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="24" cy="28" r="3" fill="#fff"/>
+          <defs><linearGradient id="logo-grad" x1="0" y1="0" x2="48" y2="48"><stop stop-color="#58a6ff"/><stop offset="1" stop-color="#a371f7"/></linearGradient></defs>
+        </svg>
+      </div>
+      <h1>Alleyesonme-AI</h1>
+      <p class="subtitle" id="auth-subtitle">Sign in to continue</p>
+      <div id="auth-error" class="error-msg"></div>
+      <form id="auth-form">
+        <div class="form-group" id="email-group" style="display:none">
+          <label>Email (optional)</label>
+          <input type="email" id="auth-email" placeholder="you@example.com" />
         </div>
-        <div class="input-bar">
-            <input type="text" id="user-input" placeholder="What is the state of the Empire?">
-            <button class="btn btn-gold" onclick="sendPrompt()">SEND</button>
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" id="auth-username" placeholder="Enter your username" required />
         </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="auth-password" placeholder="Enter your password" required />
+        </div>
+        <button type="submit" class="btn-primary" id="auth-submit-btn">Sign In</button>
+      </form>
+      <p class="auth-toggle" id="auth-toggle-text">
+        Don't have an account? <a href="#" id="auth-toggle-link">Create one</a>
+      </p>
+      <a href="#" class="back-link" onclick="showScreen('landing-screen')">Back to home</a>
     </div>
+  </div>
 
-    <script>
-        // Membership Text Rotation
-        const prices = ["Day Pass: $5", "Weekly: $25", "Monthly: $50", "3-Month: $100", "Annual: $200"];
-        let idx = 0;
-        const el = document.getElementById('price-rotate');
-        if(el) {
-            setInterval(() => {
-                idx = (idx + 1) % prices.length;
-                el.innerText = prices[idx];
-            }, 5000);
-        }
+  <!-- ===== Main App (Chat + Sidebar) ===== -->
+  <div id="app-screen" class="app-layout" style="display:none">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <svg width="28" height="28" viewBox="0 0 56 56" fill="none"><rect width="56" height="56" rx="16" fill="url(#sb)"/><path d="M18 38L28 18L38 38" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="28" cy="33" r="3.5" fill="#fff"/><defs><linearGradient id="sb" x1="0" y1="0" x2="56" y2="56"><stop stop-color="#58a6ff"/><stop offset="1" stop-color="#a371f7"/></linearGradient></defs></svg>
+          <span>Alleyesonme-AI</span>
+        </div>
+        <button class="btn-new-chat" id="btn-new-chat" title="New Chat">+ New Chat</button>
+      </div>
+      <div class="sidebar-conversations" id="conversation-list"></div>
+      <div class="sidebar-nav">
+        <button class="nav-btn" onclick="showScreen('agent-screen')"><span class="nav-icon">&#9881;</span> My Agent</button>
+        <button class="nav-btn" onclick="showScreen('store-screen')"><span class="nav-icon">&#128722;</span> Store</button>
+        <button class="nav-btn" onclick="showScreen('arcade-screen')"><span class="nav-icon">&#127918;</span> Arcade</button>
+        <button class="nav-btn" onclick="showScreen('membership-screen')"><span class="nav-icon">&#11088;</span> Membership</button>
+        <button class="nav-btn" onclick="showScreen('support-screen')"><span class="nav-icon">&#128172;</span> Support</button>
+        <button class="nav-btn admin-only" onclick="showScreen('admin-screen')"><span class="nav-icon">&#128274;</span> Admin</button>
+      </div>
+      <div class="sidebar-footer">
+        <div class="user-info" id="user-info"></div>
+        <button class="btn-logout" id="btn-logout">Sign Out</button>
+      </div>
+    </aside>
+    <!-- Mobile sidebar toggle -->
+    <button class="sidebar-toggle" id="sidebar-toggle">&#9776;</button>
 
-        // AI Message Handling
-        async function sendPrompt() {
-            const field = document.getElementById('user-input');
-            const box = document.getElementById('chat-box');
-            if(!field.value.trim()) return;
+    <!-- Chat area -->
+    <main class="chat-main">
+      <div class="chat-messages" id="chat-messages">
+        <div class="welcome-msg" id="welcome-msg">
+          <h2>Welcome to Alleyesonme-AI</h2>
+          <p>Start a new conversation or select one from the sidebar.</p>
+          <div class="quick-prompts" id="quick-prompts"></div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <div class="thinking-steps" id="thinking-steps" style="display:none"></div>
+        <form class="chat-form" id="chat-form">
+          <textarea id="chat-input" placeholder="Type your message..." rows="1"></textarea>
+          <button type="submit" class="btn-send" id="btn-send">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M4 10L16 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M11 5L16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </form>
+      </div>
+    </main>
+  </div>
 
-            box.innerHTML += `<div style="margin-bottom:15px;"><b>You:</b> ${field.value}</div>`;
-            const msg = field.value;
-            field.value = '';
+  <!-- ===== Agent Screen ===== -->
+  <div id="agent-screen" class="page-screen" style="display:none">
+    <div class="page-header">
+      <a href="#" class="back-link" onclick="showScreen('app-screen')">Back to Chat</a>
+      <h2>My AI Agent</h2>
+      <p>Your personal autonomous agent — assign tasks and get results.</p>
+    </div>
+    <div class="agent-capabilities" id="agent-capabilities"></div>
+    <div class="agent-task-form">
+      <h3>New Task</h3>
+      <select id="agent-task-type"></select>
+      <textarea id="agent-task-desc" placeholder="Describe what you need done..." rows="4"></textarea>
+      <button class="btn-primary" id="btn-submit-task">Submit Task</button>
+    </div>
+    <div class="agent-tasks-list">
+      <h3>My Tasks</h3>
+      <div id="agent-tasks"></div>
+    </div>
+  </div>
 
-            try {
-                const res = await fetch('/chat', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ prompt: msg })
-                });
-                const data = await res.json();
-                box.innerHTML += `<div style="color:var(--primary-yellow); margin-bottom:15px;"><b>Agent:</b> ${data.response}</div>`;
-            } catch (e) {
-                box.innerHTML += `<div style="color:red; margin-bottom:15px;">Fatal: Connection to The Beast severed.</div>`;
-            }
-            box.scrollTop = box.scrollHeight;
-        }
+  <!-- ===== Store Screen ===== -->
+  <div id="store-screen" class="page-screen" style="display:none">
+    <div class="page-header">
+      <a href="#" class="back-link" onclick="showScreen('app-screen')">Back to Chat</a>
+      <h2>Agent Store</h2>
+      <p>Purchase AI agent services and capabilities.</p>
+    </div>
+    <div class="store-products" id="store-products"></div>
+    <div class="store-purchases">
+      <h3>My Purchases</h3>
+      <div id="my-purchases"></div>
+    </div>
+  </div>
 
-        function toggleMenu() {
-            const m = document.getElementById('dropdown-menu');
-            m.style.display = m.style.display === 'block' ? 'none' : 'block';
-        }
-    </script>
+  <!-- ===== Arcade Screen ===== -->
+  <div id="arcade-screen" class="page-screen" style="display:none">
+    <div class="page-header">
+      <a href="#" class="back-link" onclick="goBackFromArcade()">Back</a>
+      <h2>Creator Content Arcade</h2>
+      <p>Play games created by the community! Members can upload their own.</p>
+    </div>
+    <div class="arcade-games" id="arcade-games"></div>
+    <div class="arcade-upload member-only" id="arcade-upload-section">
+      <h3>Upload Your Game</h3>
+      <input type="text" id="game-title" placeholder="Game title" />
+      <textarea id="game-description" placeholder="Short description" rows="2"></textarea>
+      <textarea id="game-html" placeholder="Paste your game HTML/JS code here..." rows="6"></textarea>
+      <button class="btn-primary" id="btn-upload-game">Submit Game</button>
+    </div>
+  </div>
+
+  <!-- ===== Game Player ===== -->
+  <div id="game-player-screen" class="page-screen" style="display:none">
+    <div class="page-header">
+      <a href="#" class="back-link" onclick="showScreen('arcade-screen')">Back to Arcade</a>
+      <h2 id="game-player-title"></h2>
+    </div>
+    <div class="game-container" id="game-container"></div>
+  </div>
+
+  <!-- ===== Membership Screen ===== -->
+  <div id="membership-screen" class="page-screen" style="display:none">
+    <div class="page-header">
+      <a href="#" class="back-link" onclick="showScreen('app-screen')">Back to Chat</a>
+      <h2>Membership Plans</h2>
+      <p>Unlock unlimited AI access, agent tasks, store, and arcade uploads.</p>
+    </div>
+    <div class="membership-status" id="membership-status"></div>
+    <div class="plans-grid" id="plans-grid"></div>
+    <div class="payment-section" id="payment-section" style="display:none">
+      <h3>Complete Payment</h3>
+      <div id="payment-details"></div>
+      <div class="payment-methods" id="payment-methods"></div>
+    </div>
+  </div>
+
+  <!-- ===== Support Screen ===== -->
+  <div id="support-screen" class="page-screen" style="display:none">
+    <div class="page-header">
+      <a href="#" class="back-link" onclick="showScreen('app-screen')">Back to Chat</a>
+      <h2>Support</h2>
+      <p>Need help? Submit a ticket and we'll get back to you.</p>
+    </div>
+    <form class="support-form" id="support-form">
+      <input type="text" id="ticket-subject" placeholder="Subject" required />
+      <textarea id="ticket-message" placeholder="Describe your issue..." rows="5" required></textarea>
+      <button type="submit" class="btn-primary">Submit Ticket</button>
+    </form>
+    <div class="tickets-list" id="tickets-list"></div>
+  </div>
+
+  <!-- ===== Admin Screen ===== -->
+  <div id="admin-screen" class="page-screen" style="display:none">
+    <div class="page-header">
+      <a href="#" class="back-link" onclick="showScreen('app-screen')">Back to Chat</a>
+      <h2>Admin Dashboard</h2>
+    </div>
+    <div class="admin-stats" id="admin-stats"></div>
+    <div class="admin-tabs">
+      <button class="admin-tab active" data-tab="admin-users">Users</button>
+      <button class="admin-tab" data-tab="admin-memberships">Memberships</button>
+      <button class="admin-tab" data-tab="admin-tickets">Tickets</button>
+      <button class="admin-tab" data-tab="admin-arcade-pending">Arcade Queue</button>
+      <button class="admin-tab" data-tab="admin-memories">Memories</button>
+      <button class="admin-tab" data-tab="admin-password">Password</button>
+    </div>
+    <div class="admin-panel" id="admin-users"></div>
+    <div class="admin-panel" id="admin-memberships" style="display:none"></div>
+    <div class="admin-panel" id="admin-tickets" style="display:none"></div>
+    <div class="admin-panel" id="admin-arcade-pending" style="display:none"></div>
+    <div class="admin-panel" id="admin-memories" style="display:none"></div>
+    <div class="admin-panel" id="admin-password" style="display:none">
+      <h3>Change Admin Password</h3>
+      <form id="password-form">
+        <input type="password" id="pw-current" placeholder="Current password" required />
+        <input type="password" id="pw-new" placeholder="New password" required />
+        <button type="submit" class="btn-primary">Change Password</button>
+      </form>
+      <div id="pw-result"></div>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
 </body>
 </html>

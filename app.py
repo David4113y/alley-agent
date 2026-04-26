@@ -1,109 +1,67 @@
+"""
+Alleyesonme-AI — Main Flask Application
+Full-stack AI agent platform with membership, store, arcade, and autonomous agents.
+"""
 import os
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for
-import google.generativeai as genai
+from dotenv import load_dotenv
 
-app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "alley_empire_secret_123")
+load_dotenv()
 
-# Configure Gemini
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel('gemini-1.5-flash')
+from flask import Flask, render_template, session
+from flask_cors import CORS
+from db_setup import init_db
 
-# Initial Default Credentials (Change these in the Admin Dashboard)
-admin_creds = {"user": "admin", "pass": "password123"}
-vip_creds = {"user": "guest", "pass": "alleyvip"}
+# Import blueprints
+from routes.auth import auth_bp
+from routes.chat import chat_bp
+from routes.admin import admin_bp
+from routes.membership import membership_bp
+from routes.support import support_bp
+from routes.store import store_bp
+from routes.arcade import arcade_bp
+from routes.agent import agent_bp
 
-# --- ROUTES ---
 
-@app.route('/')
-def index():
-    # Check if user is logged in to hide/show the yellow box
-    logged_in = 'user_id' in session
-    is_admin = session.get('is_admin', False)
-    return render_template('index.html', logged_in=logged_in, is_admin=is_admin)
+def create_app():
+    app = Flask(__name__, static_folder="static", template_folder="templates")
+    app.secret_key = os.getenv("FLASK_SECRET_KEY", "alleyesonme-secret-change-me")
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["SESSION_COOKIE_SECURE"] = os.getenv("FLASK_ENV") == "production"
+    app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB
 
-@app.route('/chat', method=['POST'])
-def chat():
-    user_input = request.json.get("prompt")
-    if not user_input:
-        return jsonify({"response": "I didn't catch that."})
+    CORS(app, supports_credentials=True)
 
-    # Optional: Logic to limit visitors to one question
-    if 'user_id' not in session:
-        # You can add logic here to track IP or cookie for the 1-question limit
-        pass
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(chat_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(membership_bp)
+    app.register_blueprint(support_bp)
+    app.register_blueprint(store_bp)
+    app.register_blueprint(arcade_bp)
+    app.register_blueprint(agent_bp)
 
-    try:
-        response = model.generate_content(user_input)
-        return jsonify({"response": response.text})
-    except Exception as e:
-        return jsonify({"response": f"The Beast encountered an error: {str(e)}"}), 500
+    # Main SPA route
+    @app.route("/")
+    def index():
+        user = session.get("user")
+        return render_template("index.html", user=user)
 
-# --- AUTHENTICATION ---
+    # Health check
+    @app.route("/health")
+    def health():
+        from llm_provider import get_provider_status
+        return {"status": "ok", "providers": get_provider_status()}
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+    # Initialize database
+    with app.app_context():
+        init_db()
 
-        # Check Admin
-        if username == admin_creds['user'] and password == admin_creds['pass']:
-            session['user_id'] = 'admin'
-            session['is_admin'] = True
-            return redirect(url_for('index'))
-        
-        # Check VIP
-        if username == vip_creds['user'] and password == vip_creds['pass']:
-            session['user_id'] = 'vip'
-            session['is_admin'] = False
-            return redirect(url_for('index'))
+    return app
 
-        return "Invalid Credentials", 401
-    return render_template('login.html')
 
-@app.route('/logout')
-def logout():
-    session.clear()
-    return redirect(url_for('index'))
+app = create_app()
 
-# --- ADMIN COMMANDS ---
-
-@app.route('/admin')
-def admin_panel():
-    if not session.get('is_admin'):
-        return redirect(url_for('login'))
-    return render_template('admin.html')
-
-@app.route('/update_admin', methods=['POST'])
-def update_admin():
-    if session.get('is_admin'):
-        admin_creds['user'] = request.form.get('username')
-        admin_creds['pass'] = request.form.get('password')
-    return redirect(url_for('admin_panel'))
-
-@app.route('/update_vip', methods=['POST'])
-def update_vip():
-    if session.get('is_admin'):
-        vip_creds['user'] = request.form.get('vip_user')
-        vip_creds['pass'] = request.form.get('vip_pass')
-    return redirect(url_for('admin_panel'))
-
-# --- ARCADE & GAMES ---
-
-@app.route('/games')
-def games_hub():
-    # Accessible to everyone
-    return render_template('games.html')
-
-@app.route('/play/alley-agents')
-def play_aa():
-    return render_template('alley_agents.html')
-
-@app.route('/play/eoe')
-def play_eoe():
-    return render_template('eoe.html')
-
-if __name__ == '__main__':
-    # Running on 0.0.0.0 so it's accessible via local IP (The Beast)
-    app.run(host='0.0.0.0', port=10000, debug=True)
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 10000))
+    app.run(host="0.0.0.0", port=port, debug=True)

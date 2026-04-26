@@ -1,5 +1,7 @@
-node_modules/
-db/*.db
 .env
+__pycache__/
+*.pyc
 local.db
-.playwright-cli/
+venv/
+.venv/
+node_modules/

@@ -1,23 +1,45 @@
 services:
   - type: web
-    name: alley-agent
-    runtime: node
-    buildCommand: npm install
-    startCommand: node server.js
+    name: alleyesonme-ai
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
     envVars:
-      - key: NODE_ENV
-        value: production
+      - key: PYTHON_VERSION
+        value: "3.11.0"
       - key: PORT
-        value: "3000"
-      - key: SESSION_SECRET
+        value: "10000"
+      - key: FLASK_SECRET_KEY
         generateValue: true
+      - key: FLASK_ENV
+        value: production
       - key: TURSO_DATABASE_URL
         sync: false
       - key: TURSO_AUTH_TOKEN
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+      - key: GROQ_API_KEY
+        sync: false
       - key: ADMIN_USERNAME
         sync: false
       - key: ADMIN_PASSWORD
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: PAYPAL_ME_LINK
+        sync: false
+      - key: CRYPTO_WALLET_LTC
+        sync: false
+      - key: CRYPTO_WALLET_BTC
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: GITHUB_PAT
+        sync: false
+      - key: RENDER_API_KEY
         sync: false
