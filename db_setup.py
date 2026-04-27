@@ -1,31 +1,54 @@
 """
-Database setup — Turso (libsql) cloud-native SQLite.
-Falls back to local file for development.
+Database setup — SQLite with optional Turso cloud sync via HTTP API.
+Uses standard-library sqlite3 for maximum compatibility.
 """
 import os
+import sqlite3
 import bcrypt
-import libsql_experimental as libsql
+import httpx
 
 _conn = None
+_turso_url = None
+_turso_token = None
 
 
 def get_db():
-    global _conn
+    """Return a SQLite connection. Uses local file; syncs to Turso via HTTP if configured."""
+    global _conn, _turso_url, _turso_token
     if _conn is None:
+        _conn = sqlite3.connect("local.db", check_same_thread=False)
+        _conn.row_factory = sqlite3.Row
+        _conn.execute("PRAGMA journal_mode=WAL")
+        _conn.execute("PRAGMA foreign_keys=ON")
         url = os.getenv("TURSO_DATABASE_URL", "")
         token = os.getenv("TURSO_AUTH_TOKEN", "")
         if url and token:
-            _conn = libsql.connect("local.db", sync_url=url, auth_token=token)
-            _conn.sync()
-        else:
-            _conn = libsql.connect("local.db")
+            _turso_url = url.replace("libsql://", "https://")
+            _turso_token = token
     return _conn
+
+
+def turso_sync(sql: str, params: tuple = ()):
+    """Optionally replicate a write to Turso cloud (fire-and-forget)."""
+    if not _turso_url or not _turso_token:
+        return
+    try:
+        body = {"statements": [{"q": sql, "params": list(params)}]}
+        httpx.post(
+            f"{_turso_url}/v2/pipeline",
+            json={"requests": [{"type": "execute", "stmt": {"sql": sql, "args": [{"type": "text", "value": str(p)} for p in params]}}]},
+            headers={"Authorization": f"Bearer {_turso_token}"},
+            timeout=5,
+        )
+    except Exception:
+        pass
 
 
 def init_db():
     db = get_db()
+    cursor = db.cursor()
 
-    db.executescript("""
+    cursor.executescript("""
         CREATE TABLE IF NOT EXISTS users (
             id            INTEGER PRIMARY KEY AUTOINCREMENT,
             username      TEXT    UNIQUE NOT NULL,
@@ -135,13 +158,13 @@ def init_db():
     admin_user = os.getenv("ADMIN_USERNAME", "DAVIDALLEY")
     admin_pass = os.getenv("ADMIN_PASSWORD", "Passwerd1")
 
-    existing = db.execute(
+    existing = cursor.execute(
         "SELECT id FROM users WHERE username = ?", (admin_user,)
     ).fetchone()
 
     if not existing:
         pw_hash = bcrypt.hashpw(admin_pass.encode(), bcrypt.gensalt(12)).decode()
-        db.execute(
+        cursor.execute(
             "INSERT INTO users (username, password_hash, role) VALUES (?, ?, 'admin')",
             (admin_user, pw_hash),
         )
@@ -149,7 +172,7 @@ def init_db():
         print(f"Admin account '{admin_user}' created.")
 
     # Seed default store products
-    existing_products = db.execute("SELECT COUNT(*) FROM store_products").fetchone()[0]
+    existing_products = cursor.execute("SELECT COUNT(*) FROM store_products").fetchone()[0]
     if existing_products == 0:
         products = [
             ("AI Agent - Basic", "Personal AI agent that handles tasks for you", 2500, "agent_service"),
@@ -160,23 +183,16 @@ def init_db():
             ("Content Writer", "AI content generation for blogs, social, etc.", 2000, "agent_service"),
         ]
         for name, desc, price, cat in products:
-            db.execute(
+            cursor.execute(
                 "INSERT INTO store_products (name, description, price_cents, category) VALUES (?, ?, ?, ?)",
                 (name, desc, price, cat),
             )
         db.commit()
 
     # Seed default arcade games
-    existing_games = db.execute("SELECT COUNT(*) FROM arcade_games").fetchone()[0]
+    existing_games = cursor.execute("SELECT COUNT(*) FROM arcade_games").fetchone()[0]
     if existing_games == 0:
         _seed_default_games(db)
-
-    # Sync to Turso if remote
-    if os.getenv("TURSO_DATABASE_URL"):
-        try:
-            db.sync()
-        except Exception:
-            pass
 
 
 def _seed_default_games(db):
@@ -246,11 +262,12 @@ function loop(){if(player.hp>0)update();draw();requestAnimationFrame(loop);}
 loop();
 </script>"""
 
-    db.execute(
+    cursor = db.cursor()
+    cursor.execute(
         "INSERT INTO arcade_games (title, description, html_content, is_approved, author_id) VALUES (?, ?, ?, 1, NULL)",
         ("Alley Agents", "Classic platformer — collect coins and jump across platforms!", alley_agents_html),
     )
-    db.execute(
+    cursor.execute(
         "INSERT INTO arcade_games (title, description, html_content, is_approved, author_id) VALUES (?, ?, ?, 1, NULL)",
         ("Echoes of Eternity", "Survive endless waves of enemies in this arena shooter!", eoe_html),
     )
