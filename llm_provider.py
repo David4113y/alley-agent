@@ -2,9 +2,9 @@
 LLM provider — multi-model fallback chain.
 
 Priority:
-  1. Gemini (google generativeai)
-  2. Groq with dolphin-mixtral / llama  (when Gemini exhausts quota)
-  3. Groq with llama-3.3-70b-versatile  (backup)
+  1. Groq with dolphin/llama-3.3-70b-versatile  (primary — fast & capable)
+  2. Gemini 2.0 Flash  (secondary — when Groq quota exhausted)
+  3. Groq with mixtral-8x7b-32768  (tertiary backup)
 """
 import os
 import json
@@ -94,32 +94,32 @@ def _chat_groq(messages: list[dict], model_name: str = "llama-3.3-70b-versatile"
 def chat_with_llm(messages: list[dict]) -> str:
     """
     Send messages through the fallback chain:
-      1. Gemini 2.0 Flash
-      2. Groq dolphin-mixtral (fallback)
-      3. Groq llama-3.3-70b-versatile (backup)
+      1. Groq — dolphin/llama-3.3-70b-versatile (primary)
+      2. Gemini 2.0 Flash (secondary)
+      3. Groq — mixtral-8x7b-32768 (tertiary backup)
     """
     errors = []
 
-    # 1) Gemini
-    try:
-        return _chat_gemini(messages)
-    except Exception as e:
-        errors.append(f"Gemini: {e}")
-        print(f"[LLM] Gemini failed: {e}")
-
-    # 2) Groq — dolphin / llama primary
+    # 1) Groq — dolphin / llama primary
     try:
         return _chat_groq(messages, "llama-3.3-70b-versatile")
     except Exception as e:
         errors.append(f"Groq-llama: {e}")
-        print(f"[LLM] Groq llama failed: {e}")
+        print(f"[LLM] Groq llama (primary) failed: {e}")
 
-    # 3) Groq — backup model
+    # 2) Gemini — secondary
+    try:
+        return _chat_gemini(messages)
+    except Exception as e:
+        errors.append(f"Gemini: {e}")
+        print(f"[LLM] Gemini (secondary) failed: {e}")
+
+    # 3) Groq — mixtral tertiary backup
     try:
         return _chat_groq(messages, "mixtral-8x7b-32768")
     except Exception as e:
         errors.append(f"Groq-mixtral: {e}")
-        print(f"[LLM] Groq mixtral backup failed: {e}")
+        print(f"[LLM] Groq mixtral (tertiary) failed: {e}")
 
     raise RuntimeError(f"All LLM providers failed: {'; '.join(errors)}")
 

@@ -7,6 +7,7 @@ from db_setup import get_db
 membership_bp = Blueprint("membership", __name__)
 
 PLANS = [
+    {"id": "daily", "label": "24-Hour Pass", "price": 5, "cents": 500, "days": 1},
     {"id": "weekly", "label": "1 Week", "price": 25, "cents": 2500, "days": 7},
     {"id": "monthly", "label": "1 Month", "price": 50, "cents": 5000, "days": 30},
     {"id": "quarterly", "label": "3 Months", "price": 100, "cents": 10000, "days": 90},
